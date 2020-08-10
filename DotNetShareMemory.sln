@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetShareMemory", "DotNetShareMemory\DotNetShareMemory.csproj", "{F9C53505-B53C-4A1C-B5A6-0BD7463C9E7F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestShareMemory", "TestShareMemory\TestShareMemory.csproj", "{19C9D902-374C-4A6C-A9AF-F04E4278DC0E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F9C53505-B53C-4A1C-B5A6-0BD7463C9E7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9C53505-B53C-4A1C-B5A6-0BD7463C9E7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9C53505-B53C-4A1C-B5A6-0BD7463C9E7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9C53505-B53C-4A1C-B5A6-0BD7463C9E7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19C9D902-374C-4A6C-A9AF-F04E4278DC0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19C9D902-374C-4A6C-A9AF-F04E4278DC0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19C9D902-374C-4A6C-A9AF-F04E4278DC0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19C9D902-374C-4A6C-A9AF-F04E4278DC0E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {56FA1E78-5B97-42D8-8AC2-530054B64321}
+	EndGlobalSection
+EndGlobal
