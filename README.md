@@ -7,6 +7,7 @@
 
 # Quick Start
 1. `using System.IO;`
+2. `ShareMemory` 类可以直接调用 `Read` 和 `Write` 函数
 
 # Reference
 [MSDN](https://docs.microsoft.com/zh-cn/dotnet/api/system.io.memorymappedfiles.memorymappedfile?view=netcore-3.1)
