@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO.MemoryMappedFiles;
-using System.Collections;
+﻿using System.Collections.Generic;
 
 namespace System.IO
 {
@@ -41,7 +36,12 @@ namespace System.IO
             try
             {
                 LogAction?.Invoke(data, logType);
-            }catch(Exception e)
+                if (logType == 1)
+                {
+                    LasetError = data.ToString();
+                }
+            }
+            catch(Exception e)
             {
                 LasetError = $"ShareMemory.Log({data},{logType})Fail:{e.Message}";
             }
@@ -52,23 +52,45 @@ namespace System.IO
         /// <summary>
         /// 管理已经创建的映射文件
         /// </summary>
-        protected static Dictionary<string, MemoryMappedFile> _MemoryManager = new Dictionary<string, MemoryMappedFile>();
+        protected static Dictionary<string, AdvanceBinaryMemoryData> _MemoryManager = new Dictionary<string, AdvanceBinaryMemoryData>();
 
         /// <summary>
         /// 获取一个内存映射
         /// </summary>
         /// <param name="memName"></param>
         /// <returns></returns>
-        protected static MemoryMappedFile GetMemeory(string memName)
+        protected static AdvanceBinaryMemoryData GetMemory(string memName)
         {
-            MemoryMappedFile mmf = null;
+            AdvanceBinaryMemoryData data = null;
             if (!_MemoryManager.ContainsKey(memName))
             {
-                mmf = MemoryMappedFile.CreateNew(memName, MEMORY_DEFAULT_CAPACITY);
-                _MemoryManager.Add(memName, mmf);
+                data = new AdvanceBinaryMemoryData(memName, MEMORY_DEFAULT_CAPACITY);
+                _MemoryManager.Add(memName, data);
             }
 
             return _MemoryManager[memName];
+        }
+
+        /// <summary>
+        /// 删除已保存的内存映射文件
+        /// </summary>
+        /// <param name="memName"></param>
+        protected static void RemoveMemory(string memName)
+        {
+            if (_MemoryManager.ContainsKey(memName))
+            {
+                try
+                {
+                    AdvanceBinaryMemoryData data = _MemoryManager[memName];
+                    data.Dispose();
+                }
+                catch (Exception e)
+                {
+                    Log($"ShareMemory.RemoveMemory({memName}):{e.Message}", 1);
+                }
+
+                _MemoryManager.Remove(memName);
+            }
         }
 
         #region Write
@@ -78,37 +100,21 @@ namespace System.IO
         /// </summary>
         /// <param name="memName"></param>
         /// <param name="info"></param>
-        public static void WriteToMemory(string memName,string data)
+        public static void Write(string memName,string data)
         {
+            AdvanceBinaryMemoryData brm = GetMemory(memName);
+            brm.Write(memName, data);
+        }
 
-            MemoryMappedFile mmf = GetMemeory(memName);
-            try
-            {
-                using (MemoryMappedViewStream stream = mmf.CreateViewStream())
-                {
-                    StreamWriter writer = new StreamWriter(stream);
-
-                    writer.BaseStream.Position = 0;
-
-                    //写入预备类型
-                    writer.Write((Int32)0);
-                    //写入预备长度
-                    writer.Write((long)0);
-                    //写入内容
-                    writer.Write(data);
-                    //获取长度
-                    long size = writer.BaseStream.Position;
-                    //写入长度
-                    writer.BaseStream.Position = 4;
-                    writer.Write((long)size);
-
-
-                    writer.Close();
-                }
-            }catch (Exception e)
-            {
-                Log($"ShareMemory.WriteToMemory({data.GetType().Name}):{e.Message}",1);
-            }
+        /// <summary>
+        /// 将一个对象写入指定共享内存
+        /// </summary>
+        /// <param name="memName"></param>
+        /// <param name="obj"></param>
+        public static void WriteObject(string memName,object obj)
+        {
+            AdvanceBinaryMemoryData brm = GetMemory(memName);
+            brm.WriteObject(memName, obj);
         }
 
         /// <summary>
@@ -116,71 +122,48 @@ namespace System.IO
         /// </summary>
         /// <param name="memName"></param>
         /// <param name="info"></param>
-        public static void WriteToMemory(string memName,byte[] data)
+        public static bool Write(string memName,byte[] data,int dataType = 0)
         {
-            MemoryMappedFile mmf  = GetMemeory(memName);
-
-            try
-            {
-                using (MemoryMappedViewStream stream = mmf.CreateViewStream())
-                {
-                    
-                    StreamWriter writer = new StreamWriter(stream);
-
-                    writer.BaseStream.Position = 0;
-
-                    writer.Write((Int32)0);
-                    writer.Write((long)0);
-                    writer.Write(data);
-                    long size = writer.BaseStream.Position;
-                    writer.BaseStream.Position = 4;
-                    writer.Write((long)size);
-
-                    writer.Close();
-                }
-            }
-            catch (Exception e)
-            {
-                Log($"ShareMemory.WriteToMemory({data.GetType().Name}):{e.Message}", 1);
-            }
+            AdvanceBinaryMemoryData brm = GetMemory(memName);
+            return brm.Write(memName, data,dataType);
         }
 
         #endregion
 
         #region Read
 
-        public static string Read(string memName)
+        /// <summary>
+        /// 读取二进制数据组
+        /// </summary>
+        /// <param name="memName"></param>
+        /// <returns></returns>
+        public static byte[] Read(string memName)
         {
-            MemoryMappedFile mmf = GetMemeory(memName);
+            AdvanceBinaryMemoryData brm = GetMemory(memName);
+            return brm.Read(memName);
+        }
 
-            try
-            {
-                using (MemoryMappedViewStream stream = mmf.CreateViewStream())
-                {
+        /// <summary>
+        /// 从共享内从中读取字符串
+        /// </summary>
+        /// <param name="memName"></param>
+        /// <returns></returns>
+        public static string ReadString(string memName)
+        {
+            AdvanceBinaryMemoryData brm = GetMemory(memName);
+            return brm.ReadString(memName);
+        }
 
-                    StreamReader reader = new StreamReader(stream);
-                    char[] Int32Bytes = new char[4];
-                    char[] Int64Bytes = new char[8];
-
-                    reader.BaseStream.Position = 4;
-
-                    reader.Read(Int64Bytes, 0, 8);
-
-
-                    reader.Write((Int32)0);
-                    writer.Write((long)0);
-                    writer.Write(data);
-                    long size = writer.BaseStream.Position;
-                    writer.BaseStream.Position = 4;
-                    writer.Write((long)size);
-
-                    writer.Close();
-                }
-            }
-            catch (Exception e)
-            {
-                Log($"ShareMemory.WriteToMemory({data.GetType().Name}):{e.Message}", 1);
-            }
+        /// <summary>
+        /// 读取一个对象
+        /// </summary>
+        /// <param name="memName"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static T ReadObject<T>(string memName)
+        {
+            AdvanceBinaryMemoryData brm = GetMemory(memName);
+            return brm.ReadObject<T>(memName);
         }
 
         #endregion

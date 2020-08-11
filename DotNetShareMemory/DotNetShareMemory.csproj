@@ -40,6 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdvanceBinaryMemoryData.cs" />
+    <Compile Include="BinaryMemoryData.cs" />
+    <Compile Include="MemoryData.cs" />
     <Compile Include="ShareMemory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
