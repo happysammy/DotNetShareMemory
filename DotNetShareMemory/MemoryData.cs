@@ -99,7 +99,7 @@ namespace System.IO
         }
 
         /// <summary>
-        /// 构造一个新的共享内存映射文件
+        /// 构造一个新的共享内存映射文件（用于更新共享区大小）
         /// </summary>
         /// <param name="name"></param>
         /// <param name="size"></param>
@@ -129,6 +129,9 @@ namespace System.IO
             }
         }
 
+        /// <summary>
+        /// 回收资源
+        /// </summary>
         public virtual void Dispose()
         {
             if (_MemFile == null || _MemFile.SafeMemoryMappedFileHandle.IsClosed || _MemFile.SafeMemoryMappedFileHandle.IsInvalid)

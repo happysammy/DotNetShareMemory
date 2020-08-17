@@ -22,6 +22,12 @@ namespace System.IO
         {
         }
 
+        /// <summary>
+        /// 通过文字编码构造一个共享内存区域
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="size"></param>
+        /// <param name="encoding"></param>
         public AdvanceBinaryMemoryData(string name, long size, Encoding encoding) : base(name, size)
         {
             _DataEncoding = encoding;
@@ -53,7 +59,7 @@ namespace System.IO
         /// </summary>
         /// <param name="memName"></param>
         /// <param name="obj"></param>
-        public virtual void WriteObject(string memName, object obj)
+        public virtual bool WriteObject(string memName, object obj)
         {
             int size = Marshal.SizeOf(obj);
             IntPtr ptr = Marshal.AllocHGlobal(size);
@@ -64,10 +70,12 @@ namespace System.IO
                 byte[] data = new byte[size];
                 Marshal.Copy(ptr, data, 0, size);
                 Write(memName, data);
+                return true;
             }
             catch (Exception e)
             {
                 Log($"{_Name}({GetType()}).Write({obj.GetType().Name}):{e.Message}", 1);
+                return false;
             }
         }
 

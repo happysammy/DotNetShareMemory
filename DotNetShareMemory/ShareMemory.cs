@@ -111,10 +111,10 @@ namespace System.IO
         /// </summary>
         /// <param name="memName"></param>
         /// <param name="obj"></param>
-        public static void WriteObject(string memName,object obj)
+        public static bool WriteObject(string memName,object obj)
         {
             AdvanceBinaryMemoryData brm = GetMemory(memName);
-            brm.WriteObject(memName, obj);
+            return brm.WriteObject(memName, obj);
         }
 
         /// <summary>
